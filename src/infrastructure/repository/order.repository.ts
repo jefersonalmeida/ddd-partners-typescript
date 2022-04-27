@@ -75,7 +75,29 @@ export default class OrderRepository implements OrderRepositoryInterface {
     }
 
     async update(entity: Order): Promise<void> {
-        // return Promise.reject('Order update not allowed');
-        throw new Error('Order update not allowed');
+
+        await OrderItemModel.destroy({where: {orderId: entity.id}});
+        for (const i of entity.items) {
+            await OrderItemModel.create({
+                id: i.id,
+                orderId: entity.id,
+                productId: i.productId,
+                name: i.name,
+                quantity: i.quantity,
+                price: i.price,
+            });
+        }
+
+        await OrderModel.update({
+                id: entity.id,
+                customerId: entity.customerId,
+                total: entity.total,
+            },
+            {
+                where: {
+                    id: entity.id,
+                },
+            },
+        );
     }
 }

@@ -4,7 +4,7 @@ export default class Order {
 
     private readonly _id: string;
     private readonly _customerId: string;
-    private readonly _items: OrderItem[];
+    private _items: OrderItem[];
 
     constructor(id: string, customerId: string, items: OrderItem[]) {
         this._id = id;
@@ -43,5 +43,22 @@ export default class Order {
 
     get total(): number {
         return this._items.reduce((acc, item) => acc + item.price, 0);
+    }
+
+    addItem(item: OrderItem) {
+        const itemExists = this._items.find(i => i.productId === item.productId);
+        if(itemExists) {
+            itemExists.addQuantity(item.quantity);
+            this._items = [...this._items.filter(i => i.id !== itemExists.id), itemExists];
+        } else {
+            this._items = [...this._items, item];
+        }
+    }
+
+    removeItem(item: OrderItem) {
+        if (this._items.length === 1) {
+            throw new Error('Items must be greater than or equal to 1');
+        }
+        this._items = this._items.filter(i => i.id !== item.id);
     }
 }

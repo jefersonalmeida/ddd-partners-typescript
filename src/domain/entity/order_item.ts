@@ -4,7 +4,7 @@ export default class OrderItem {
     private readonly _productId: string;
     private readonly _name: string;
     private readonly _price: number;
-    private readonly _quantity: number;
+    private _quantity: number;
 
     constructor(id: string, productId: string, name: string, price: number, quantity: number) {
         this._id = id;
@@ -32,5 +32,16 @@ export default class OrderItem {
 
     get price(): number {
         return this._price * this._quantity;
+    }
+
+    addQuantity(qtd: number) {
+        this._quantity += qtd;
+    }
+
+    removeQuantity(qtd: number) {
+        if (this._quantity === 1) {
+            throw new Error('Quantity must be greater than or equal to 1');
+        }
+        this._quantity -= qtd;
     }
 }

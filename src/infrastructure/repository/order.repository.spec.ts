@@ -169,17 +169,87 @@ describe('Order repository tests', () => {
         await customerRepository.create(customer);
 
         const productRepository = new ProductRepository();
-        const product = new Product(uuid(), 'Product 1', 100);
-        await productRepository.create(product);
+        const product1 = new Product(uuid(), 'Product 1', 100);
+        await productRepository.create(product1);
 
-        const orderItem = new OrderItem(uuid(), product.id, product.name, product.price, 1);
-        const order = new Order(uuid(), customer.id, [orderItem]);
+        const orderItem1 = new OrderItem(uuid(), product1.id, product1.name, product1.price, 1);
+        const order = new Order(uuid(), customer.id, [orderItem1]);
 
         const orderRepository = new OrderRepository();
         await orderRepository.create(order);
 
-        await expect(async () => {
-            await orderRepository.update(order);
-        }).rejects.toEqual(new Error('Order update not allowed'));
+        const orderModel = await OrderModel.findOne({
+            where: {id: order.id},
+            include: ['items'],
+        });
+
+        expect(orderModel.toJSON()).toStrictEqual({
+            id: order.id,
+            customerId: customer.id,
+            total: order.total,
+            items: [
+                {
+                    id: orderItem1.id,
+                    orderId: order.id,
+                    productId: orderItem1.productId,
+                    name: orderItem1.name,
+                    quantity: orderItem1.quantity,
+                    price: orderItem1.price,
+                },
+            ],
+        });
+
+        const product2 = new Product(uuid(), 'Product 2', 150);
+        await productRepository.create(product2);
+        const orderItem2 = new OrderItem(uuid(), product2.id, product2.name, product2.price, 1);
+        order.addItem(orderItem2);
+
+        const product3 = new Product(uuid(), 'Product 3', 200);
+        await productRepository.create(product3);
+        const orderItem3 = new OrderItem(uuid(), product3.id, product3.name, product3.price, 5);
+        order.addItem(orderItem3);
+
+        order.removeItem(orderItem1);
+
+        await orderRepository.update(order);
+
+        const orderModel2 = await OrderModel.findOne({
+            where: {id: order.id},
+            include: ['items'],
+        });
+
+        expect(orderModel2.total).toEqual(order.total);
+        expect(orderModel2.items.length).toEqual(order.items.length);
+        expect(orderModel2.toJSON()).toStrictEqual({
+            id: order.id,
+            customerId: customer.id,
+            total: order.total,
+            items: [
+                // {
+                //     id: orderItem1.id,
+                //     orderId: order.id,
+                //     productId: orderItem1.productId,
+                //     name: orderItem1.name,
+                //     quantity: orderItem1.quantity,
+                //     price: orderItem1.price,
+                // },
+                {
+                    id: orderItem2.id,
+                    orderId: order.id,
+                    productId: orderItem2.productId,
+                    name: orderItem2.name,
+                    quantity: orderItem2.quantity,
+                    price: orderItem2.price,
+                },
+                {
+                    id: orderItem3.id,
+                    orderId: order.id,
+                    productId: orderItem3.productId,
+                    name: orderItem3.name,
+                    quantity: orderItem3.quantity,
+                    price: orderItem3.price,
+                },
+            ],
+        });
     });
 });
