@@ -30,7 +30,7 @@ describe('Customer repository tests', () => {
         const id = uuid();
         const customer = new Customer(id, 'Customer 1');
         customer.addRewardPoints(100);
-        customer.changeAddress(new Address('Street 1', 1, '78000000', 'City'));
+        customer.changeAddress(new Address('Street 1', 1, 'zipcode', 'City'));
 
         await customerRepository.create(customer);
 
@@ -53,7 +53,7 @@ describe('Customer repository tests', () => {
         const id = uuid();
         const customer = new Customer(id, 'Customer 1');
         customer.addRewardPoints(10);
-        customer.changeAddress(new Address('Street 1', 1, '78000000', 'City'));
+        customer.changeAddress(new Address('Street 1', 1, 'zipcode', 'City'));
         customer.activate();
 
         await customerRepository.create(customer);
@@ -87,11 +87,11 @@ describe('Customer repository tests', () => {
 
         const customer1 = new Customer(uuid(), 'Customer 1');
         customer1.addRewardPoints(10);
-        customer1.changeAddress(new Address('Street 1', 1, '78000000', 'City'));
+        customer1.changeAddress(new Address('Street 1', 1, 'zipcode', 'City'));
 
         const customer2 = new Customer(uuid(), 'Customer 2');
         customer2.addRewardPoints(30);
-        customer2.changeAddress(new Address('Street 1', 1, '78000000', 'City'));
+        customer2.changeAddress(new Address('Street 1', 1, 'zipcode', 'City'));
         customer2.activate();
 
         await customerRepository.create(customer1);
@@ -111,7 +111,7 @@ describe('Customer repository tests', () => {
         const customerRepository = new CustomerRepository();
         const id = uuid();
         const customer = new Customer(id, 'Customer 1');
-        customer.changeAddress(new Address('Street 1', 1, '78000000', 'City'));
+        customer.changeAddress(new Address('Street 1', 1, 'zipcode', 'City'));
 
         await customerRepository.create(customer);
 
