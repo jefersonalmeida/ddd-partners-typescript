@@ -3,6 +3,7 @@ import CreateCustomerUseCase from '../../../usecase/customer/create/create.custo
 import CustomerRepository from '../../customer/repository/customer.repository';
 import ListCustomerUseCase from '../../../usecase/customer/list/list.customer.use-case';
 import {InputCreateCustomerDto} from '../../../usecase/customer/create/create.customer.dto';
+import CustomerPresenter from '../presenter/customer.presenter';
 
 export const customerRoute = express.Router();
 
@@ -29,7 +30,14 @@ customerRoute.get('/', async (req: Request, res: Response) => {
     const useCase = new ListCustomerUseCase(new CustomerRepository());
     try {
         const output = await useCase.execute({});
-        res.send(output);
+
+        // O retorno do DTO difere do resultado da API
+        // aqui é json. Mas se eu quiser o resultado em XML, Kafka?
+
+        res.format({
+            json: () => res.send(output),
+            xml: () => res.send(CustomerPresenter.toListXML(output)),
+        });
     } catch (e) {
         res.status(500).send(e);
     }
