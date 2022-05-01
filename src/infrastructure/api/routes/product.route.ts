@@ -3,6 +3,7 @@ import CreateProductUseCase from '../../../usecase/product/create/create.product
 import ProductRepository from '../../product/repository/product.repository';
 import ListProductUseCase from '../../../usecase/product/list/list.product.use-case';
 import {InputCreateProductDto} from '../../../usecase/product/create/create.product.dto';
+import ProductPresenter from '../presenter/product.presenter';
 
 export const productRoute = express.Router();
 
@@ -25,7 +26,10 @@ productRoute.get('/', async (req: Request, res: Response) => {
     const useCase = new ListProductUseCase(new ProductRepository());
     try {
         const output = await useCase.execute({});
-        res.send(output);
+        res.format({
+            json: () => res.send(output),
+            xml: () => res.send(ProductPresenter.toListXML(output)),
+        });
     } catch (e) {
         res.status(500).send(e);
     }
