@@ -1,11 +1,11 @@
-import {v4 as uuid} from 'uuid';
-import Customer from '../../../domain/customer/entity/customer';
 import Address from '../../../domain/customer/value-object/address';
 import FindCustomerUseCase from './find.customer.use-case';
+import CustomerFactory from '../../../domain/customer/factory/customer.factory';
 
-const id = uuid();
-const customer = new Customer(id, 'Customer 1');
-customer.changeAddress(new Address('Street 1', 1, 'zipcode', 'City'));
+const customer = CustomerFactory.createWithAddress(
+    'Customer 1',
+    new Address('Street 1', 1, 'zipcode', 'City'),
+);
 
 const MockRepository = () => {
     return {
@@ -22,9 +22,9 @@ describe('Unit Test find customer use case', () => {
         const customerRepository = MockRepository();
         const useCase = new FindCustomerUseCase(customerRepository);
 
-        const input = {id};
+        const input = {id: customer.id};
         const output = {
-            id,
+            id: customer.id,
             name: customer.name,
             address: {
                 street: customer.address.street,
@@ -45,7 +45,7 @@ describe('Unit Test find customer use case', () => {
         });
         const useCase = new FindCustomerUseCase(customerRepository);
 
-        const input = {id};
+        const input = {id: customer.id};
 
         await expect(async () => {
             await useCase.execute(input);
